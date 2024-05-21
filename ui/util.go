@@ -56,7 +56,82 @@ func readKey(window *glfw.Window, key glfw.Key) bool {
 	return window.GetKey(key) == glfw.Press
 }
 
-func readKeys(window *glfw.Window, turbo bool) [8]bool {
+func readKeysFromUser1(message []byte, turbo bool) [8]bool {
+	var result [8]bool
+	result[nes.ButtonA] = false 
+	result[nes.ButtonB] = false 
+	result[nes.ButtonSelect] = false 
+	result[nes.ButtonStart] = false 
+	result[nes.ButtonUp] = false
+	result[nes.ButtonDown] = false 
+	result[nes.ButtonLeft] = false
+	result[nes.ButtonRight] = false 
+	if string(message) == "Z"{
+		result[nes.ButtonA] = true
+	}
+	if string(message) == "X"{
+		result[nes.ButtonB] = true
+	}
+	if string(message) == "Enter"{
+		log.Println("실행됨")
+		result[nes.ButtonStart] = true
+	}
+	if string(message) == "RightShift"{
+		result[nes.ButtonSelect] = true
+	}
+	if string(message) == "UP"{
+		result[nes.ButtonUp] = true
+	}
+	if string(message) == "DOWN"{
+		result[nes.ButtonDown] = true
+	}
+	if string(message) == "LEFT"{
+		result[nes.ButtonLeft] = true
+	}
+	if string(message) == "RIGHT"{
+		result[nes.ButtonRight] = true
+	}
+	return result
+}
+
+func readKeysFromUser2(message []byte, turbo bool) [8]bool {
+	var result [8]bool
+	result[nes.ButtonA] = false 
+	result[nes.ButtonB] = false 
+	result[nes.ButtonSelect] = false 
+	result[nes.ButtonStart] = false 
+	result[nes.ButtonUp] = false
+	result[nes.ButtonDown] = false 
+	result[nes.ButtonLeft] = false
+	result[nes.ButtonRight] = false 
+	if string(message) == "J"{
+		result[nes.ButtonA] = true
+	}
+	if string(message) == "K"{
+		result[nes.ButtonB] = true
+	}
+	if string(message) == "P"{
+		result[nes.ButtonStart] = true
+	}
+	if string(message) == "O"{
+		result[nes.ButtonSelect] = true
+	}
+	if string(message) == "T"{
+		result[nes.ButtonUp] = true
+	}
+	if string(message) == "G"{
+		result[nes.ButtonDown] = true
+	}
+	if string(message) == "F"{
+		result[nes.ButtonLeft] = true
+	}
+	if string(message) == "H"{
+		result[nes.ButtonRight] = true
+	}
+	return result
+}
+
+func readKeys1(window *glfw.Window, turbo bool) [8]bool {
 	var result [8]bool
 	result[nes.ButtonA] = readKey(window, glfw.KeyZ) || (turbo && readKey(window, glfw.KeyA))
 	result[nes.ButtonB] = readKey(window, glfw.KeyX) || (turbo && readKey(window, glfw.KeyS))
@@ -67,6 +142,41 @@ func readKeys(window *glfw.Window, turbo bool) [8]bool {
 	result[nes.ButtonLeft] = readKey(window, glfw.KeyLeft)
 	result[nes.ButtonRight] = readKey(window, glfw.KeyRight)
 	return result
+}
+
+func readKeys2(window *glfw.Window, turbo bool) [8]bool {
+	var result [8]bool
+	result[nes.ButtonA] = readKey(window, glfw.KeyJ) || (turbo && readKey(window, glfw.KeyJ))
+	result[nes.ButtonB] = readKey(window, glfw.KeyK) || (turbo && readKey(window, glfw.KeyK))
+	result[nes.ButtonSelect] = readKey(window, glfw.KeyO)
+	result[nes.ButtonStart] = readKey(window, glfw.KeyP)
+	result[nes.ButtonUp] = readKey(window, glfw.KeyT)
+	result[nes.ButtonDown] = readKey(window, glfw.KeyG)
+	result[nes.ButtonLeft] = readKey(window, glfw.KeyF)
+	result[nes.ButtonRight] = readKey(window, glfw.KeyH)
+	return result
+}
+
+func readKeysFromUser(message []byte, turbo bool) [8]bool {
+	var result [8]bool
+	result[nes.ButtonA] = false || (turbo && false)
+	result[nes.ButtonB] = false || (turbo && false)
+	result[nes.ButtonSelect] = false || (turbo && false)
+	result[nes.ButtonStart] = false || (turbo && false)
+	result[nes.ButtonUp] = false || (turbo && false)
+	result[nes.ButtonDown] = false || (turbo && false)
+	result[nes.ButtonLeft] = false || (turbo && false)
+	result[nes.ButtonRight] = false || (turbo && false)
+	if string(message) == "Z" {
+		log.Println("실행됨")
+		result[nes.ButtonRight] = true
+	}
+	if string(message) == "W" {
+		log.Println("실행됨")
+		result[nes.ButtonStart] = true
+	}
+	return result
+	
 }
 
 func readJoystick(joy glfw.Joystick, turbo bool) [8]bool {

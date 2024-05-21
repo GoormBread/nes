@@ -18,6 +18,7 @@ type GameView struct {
 	texture  uint32
 	record   bool
 	frames   []image.Image
+	// message []byte
 }
 
 func NewGameView(director *Director, console *nes.Console, title, hash string) View {
@@ -54,8 +55,8 @@ func (view *GameView) save(snapshot int) {
 func (view *GameView) Enter() {
 	gl.ClearColor(0, 0, 0, 1)
 	view.director.SetTitle(view.title)
-	view.console.SetAudioChannel(view.director.audio.channel)
-	view.console.SetAudioSampleRate(view.director.audio.sampleRate)
+	// view.console.SetAudioChannel(view.director.audio.channel)
+	// view.console.SetAudioSampleRate(view.director.audio.sampleRate)
 	view.director.window.SetKeyCallback(view.onKey)
 	view.load(-1)
 }
@@ -82,8 +83,10 @@ func (view *GameView) Update(t, dt float64) {
 	if readKey(window, glfw.KeyEscape) {
 		view.director.ShowMenu()
 	}
-	updateControllers(window, console)
+
 	console.StepSeconds(dt)
+	// updateControllers(window, console)
+	// updateCloudControllers(window, view.message, console)
 	gl.BindTexture(gl.TEXTURE_2D, view.texture)
 	setTexture(console.Buffer())
 	drawBuffer(view.director.window)
@@ -146,11 +149,50 @@ func drawBuffer(window *glfw.Window) {
 	gl.End()
 }
 
+func updateCloudControllers(window *glfw.Window, message []byte, console *nes.Console) {
+	turbo := console.PPU.Frame%6 < 3
+	k1 := readKeysFromUser1(message, turbo)
+	k2 := readKeysFromUser2(message, turbo)
+	console.SetButtons1(k1)
+	console.SetButtons2(k2)
+	// window.MakeContextCurrent()
+	// var result [8]bool
+	// result[nes.ButtonA] = false
+	// result[nes.ButtonB] = false
+	// result[nes.ButtonSelect] = false
+	// result[nes.ButtonStart] = false
+	// result[nes.ButtonUp] = false
+	// result[nes.ButtonDown] = false
+	// result[nes.ButtonLeft] = false
+	// result[nes.ButtonRight] = false
+	// console.SetButtons1(result)
+	
+}
+func updateCloudControllersDefault(window *glfw.Window, message []byte, console *nes.Console) {
+	turbo := console.PPU.Frame%6 < 3
+	j2 := readJoystick(glfw.Joystick2, turbo)
+	window.MakeContextCurrent()
+	var result [8]bool
+	result[nes.ButtonA] = false
+	result[nes.ButtonB] = false
+	result[nes.ButtonSelect] = false
+	result[nes.ButtonStart] = false
+	result[nes.ButtonUp] = false
+	result[nes.ButtonDown] = false
+	result[nes.ButtonLeft] = false
+	result[nes.ButtonRight] = false
+	console.SetButtons1(result)
+	console.SetButtons2(j2)
+	
+}
+
 func updateControllers(window *glfw.Window, console *nes.Console) {
 	turbo := console.PPU.Frame%6 < 3
-	k1 := readKeys(window, turbo)
+	k1 := readKeys1(window, turbo)
+	k2 := readKeys2(window, turbo)
 	j1 := readJoystick(glfw.Joystick1, turbo)
-	j2 := readJoystick(glfw.Joystick2, turbo)
+	// j2 := readJoystick(glfw.Joystick2, turbo)
 	console.SetButtons1(combineButtons(k1, j1))
-	console.SetButtons2(j2)
+	console.SetButtons2(k2)
+	window.MakeContextCurrent()
 }

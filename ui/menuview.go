@@ -40,7 +40,7 @@ func NewMenuView(director *Director, paths []string) View {
 
 func (view *MenuView) checkButtons() {
 	window := view.director.window
-	k1 := readKeys(window, false)
+	k1 := readKeys1(window, false)
 	j1 := readJoystick(glfw.Joystick1, false)
 	j2 := readJoystick(glfw.Joystick2, false)
 	buttons := combineButtons(combineButtons(j1, j2), k1)
