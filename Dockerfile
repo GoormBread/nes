@@ -33,7 +33,7 @@ ENV DISPLAY=:1
 ENV RTSP_URL=rtsp://mtx:8554/mystream
 
 # 애플리케이션 및 FFmpeg 명령어 실행
-CMD ["bash", "-c", "Xvfb :1 -screen 0 1920x1080x24 & sleep 5 && DISPLAY=:1 ./nesexe ./rom/Super_mario_brothers.nes & ffmpeg -f x11grab -video_size 1920x1080 -framerate 30 -i :1 -c:v libx264 -preset ultrafast -qp 0 -f rtsp rtsp://mtx:8554/mystream"]
+CMD ["bash", "-c", "Xvfb :1 -screen 0 1920x1080x24 & sleep 5 && DISPLAY=:1 ./nesexe ./rom/Super_mario_brothers.nes & ffmpeg -f x11grab -video_size 1920x1080 -framerate 30 -i :1 -c:v libx264 -preset ultrafast -qp 0 -f rtsp rtsp://localhost:8554/mystream"]
 
 # 포트 노출
 EXPOSE 8080
