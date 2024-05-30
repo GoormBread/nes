@@ -1,23 +1,24 @@
 package ui
 
 import (
-	"crypto/md5"
-	"encoding/binary"
-	"fmt"
-	"image"
-	"image/color"
-	"image/draw"
-	"image/gif"
-	"image/png"
-	"io/ioutil"
-	"log"
-	"os"
-	"os/user"
-	"path"
+    "crypto/md5"
+    "encoding/binary"
+    "encoding/json"
+    "fmt"
+    "image"
+    "image/color"
+    "image/draw"
+    "image/gif"
+    "image/png"
+    "io/ioutil"
+    "log"
+    "os"
+    "os/user"
+    "path"
 
-	"github.com/fogleman/nes/nes"
-	"github.com/go-gl/gl/v2.1/gl"
-	"github.com/go-gl/glfw/v3.2/glfw"
+    "github.com/fogleman/nes/nes"
+    "github.com/go-gl/gl/v2.1/gl"
+    "github.com/go-gl/glfw/v3.2/glfw"
 )
 
 var homeDir string
@@ -57,78 +58,89 @@ func readKey(window *glfw.Window, key glfw.Key) bool {
 }
 
 func readKeysFromUser1(message []byte, turbo bool) [8]bool {
-	var result [8]bool
-	result[nes.ButtonA] = false 
-	result[nes.ButtonB] = false 
-	result[nes.ButtonSelect] = false 
-	result[nes.ButtonStart] = false 
-	result[nes.ButtonUp] = false
-	result[nes.ButtonDown] = false 
-	result[nes.ButtonLeft] = false
-	result[nes.ButtonRight] = false 
-	if string(message) == "Z"{
-		result[nes.ButtonA] = true
-	}
-	if string(message) == "X"{
-		result[nes.ButtonB] = true
-	}
-	if string(message) == "Enter"{
-		log.Println("실행됨")
-		result[nes.ButtonStart] = true
-	}
-	if string(message) == "RightShift"{
-		result[nes.ButtonSelect] = true
-	}
-	if string(message) == "UP"{
-		result[nes.ButtonUp] = true
-	}
-	if string(message) == "DOWN"{
-		result[nes.ButtonDown] = true
-	}
-	if string(message) == "LEFT"{
-		result[nes.ButtonLeft] = true
-	}
-	if string(message) == "RIGHT"{
-		result[nes.ButtonRight] = true
-	}
-	return result
+    var result [8]bool
+    result[nes.ButtonA] = false
+    result[nes.ButtonB] = false
+    result[nes.ButtonSelect] = false
+    result[nes.ButtonStart] = false
+    result[nes.ButtonUp] = false
+    result[nes.ButtonDown] = false
+    result[nes.ButtonLeft] = false
+    result[nes.ButtonRight] = false
+
+    var pressedKeys []string
+    err := json.Unmarshal(message, &pressedKeys)
+    if err != nil {
+        log.Println("JSON 파싱 오류:", err)
+        return result
+    }
+
+    for _, key := range pressedKeys {
+        switch key {
+        case "Z":
+            result[nes.ButtonA] = true
+        case "X":
+            result[nes.ButtonB] = true
+        case "Enter":
+            log.Println("실행됨")
+            result[nes.ButtonStart] = true
+        case "RightShift":
+            result[nes.ButtonSelect] = true
+        case "UP":
+            result[nes.ButtonUp] = true
+        case "DOWN":
+            result[nes.ButtonDown] = true
+        case "LEFT":
+            result[nes.ButtonLeft] = true
+        case "RIGHT":
+            result[nes.ButtonRight] = true
+        }
+    }
+
+    return result
 }
 
 func readKeysFromUser2(message []byte, turbo bool) [8]bool {
-	var result [8]bool
-	result[nes.ButtonA] = false 
-	result[nes.ButtonB] = false 
-	result[nes.ButtonSelect] = false 
-	result[nes.ButtonStart] = false 
-	result[nes.ButtonUp] = false
-	result[nes.ButtonDown] = false 
-	result[nes.ButtonLeft] = false
-	result[nes.ButtonRight] = false 
-	if string(message) == "J"{
-		result[nes.ButtonA] = true
-	}
-	if string(message) == "K"{
-		result[nes.ButtonB] = true
-	}
-	if string(message) == "P"{
-		result[nes.ButtonStart] = true
-	}
-	if string(message) == "O"{
-		result[nes.ButtonSelect] = true
-	}
-	if string(message) == "T"{
-		result[nes.ButtonUp] = true
-	}
-	if string(message) == "G"{
-		result[nes.ButtonDown] = true
-	}
-	if string(message) == "F"{
-		result[nes.ButtonLeft] = true
-	}
-	if string(message) == "H"{
-		result[nes.ButtonRight] = true
-	}
-	return result
+    var result [8]bool
+    result[nes.ButtonA] = false
+    result[nes.ButtonB] = false
+    result[nes.ButtonSelect] = false
+    result[nes.ButtonStart] = false
+    result[nes.ButtonUp] = false
+    result[nes.ButtonDown] = false
+    result[nes.ButtonLeft] = false
+    result[nes.ButtonRight] = false
+
+    var pressedKeys []string
+    err := json.Unmarshal(message, &pressedKeys)
+    if err != nil {
+        log.Println("JSON 파싱 오류:", err)
+        return result
+    }
+
+    for _, key := range pressedKeys {
+        switch key {
+        case "Z":
+            result[nes.ButtonA] = true
+        case "X":
+            result[nes.ButtonB] = true
+        case "Enter":
+            log.Println("실행됨")
+            result[nes.ButtonStart] = true
+        case "RightShift":
+            result[nes.ButtonSelect] = true
+        case "UP":
+            result[nes.ButtonUp] = true
+        case "DOWN":
+            result[nes.ButtonDown] = true
+        case "LEFT":
+            result[nes.ButtonLeft] = true
+        case "RIGHT":
+            result[nes.ButtonRight] = true
+        }
+    }
+
+    return result
 }
 
 func readKeys1(window *glfw.Window, turbo bool) [8]bool {
