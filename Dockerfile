@@ -1,6 +1,5 @@
 FROM ubuntu:latest
 
-# 필요한 패키지 설치
 RUN apt-get update && apt-get install -y \
     libportaudio2 \
     libgl1-mesa-dev \
@@ -12,28 +11,42 @@ RUN apt-get update && apt-get install -y \
     libxxf86vm-dev \
     portaudio19-dev \
     git \
-    golang \
+    golang-go \
     xorg \
     x11-apps \
     ffmpeg \
-    xvfb
+    xvfb \
+    libasound2-dev \
+    pkg-config \
+    pulseaudio \
+    pulseaudio-utils \
+    libpulse-dev
 
-# 작업 디렉토리 설정
 WORKDIR /app
 
-# 애플리케이션 소스 코드 복사
 COPY . .
+RUN go mod tidy && \
+    go mod download
 
-# Go 애플리케이션 빌드
-RUN go get -u github.com/fogleman/nes && \
-    go build -v -o nesexe
+# 필요한 모듈 설치
+RUN go get github.com/go-gl/gl/v2.1/gl && \
+    go get github.com/go-gl/glfw/v3.2/glfw && \
+    go get github.com/mesilliac/pulse-simple
+    
+RUN go build -v -o nesexe
 
-# 환경 변수 설정
 ENV DISPLAY=:1
-# ENV RTSP_URL=rtsp://mtx:8554/mystream
+ENV RTSP_URL=rtsp://mtx:8554/mystream
+ENV PULSE_LATENCY_MSEC=1
 
-# 애플리케이션 및 FFmpeg 명령어 실행
-CMD ["bash", "-c", "Xvfb :1 -screen 0 768x768x24 & sleep 5 && DISPLAY=:1 ./nesexe ./rom/Super_mario_brothers.nes & ffmpeg -f x11grab -i :1 -map 0:v:0 -c:v libx264 -preset ultrafast -tune zerolatency -r 151 -b:v 1000k -s 1024x768 -f rtsp rtsp://localhost:8554/mystream"]
+RUN echo "#!/bin/bash\n\
+pulseaudio -D --exit-idle-time=-1 &\n\
+sleep 5\n\
+pacmd load-module module-null-sink sink_name=v1\n\
+pacmd set-default-sink v1\n\
+pacmd set-default-source v1.monitor" > pulseaudio-setup.sh && \
+chmod +x pulseaudio-setup.sh
 
-# 포트 노출
+CMD ["bash", "-c", "./pulseaudio-setup.sh && Xvfb :1 -screen 0 1024x768x24 & sleep 10 && DISPLAY=:1 ./nesexe ./rom/Super_mario_brothers.nes"]
+
 EXPOSE 8080

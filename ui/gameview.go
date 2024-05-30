@@ -55,8 +55,8 @@ func (view *GameView) save(snapshot int) {
 func (view *GameView) Enter() {
 	gl.ClearColor(0, 0, 0, 1)
 	view.director.SetTitle(view.title)
-	// view.console.SetAudioChannel(view.director.audio.channel)
-	// view.console.SetAudioSampleRate(view.director.audio.sampleRate)
+	view.console.SetAudioChannel(view.director.audio.channel)
+	view.console.SetAudioSampleRate(view.director.audio.sampleRate)
 	view.director.window.SetKeyCallback(view.onKey)
 	view.load(-1)
 }

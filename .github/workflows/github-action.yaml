@@ -1,0 +1,80 @@
+name: Update docker image and helm chart
+
+on:
+    pull_request:
+        branches:
+            - develop
+        types: [closed]
+
+concurrency:
+  group: game-helm-ci
+  cancel-in-progress: true
+
+jobs:
+        
+    docker-image-build-and-test:
+        runs-on: ubuntu-latest
+
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+        
+        - name: Login to Docker
+          uses: docker/login-action@v2
+          with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_SECRET }}
+
+        - name: Build Docker image
+          run: docker build -t geonhyukseo/goormnes:${{ github.sha }} .
+
+        - name: Push Docker image
+          run: docker push geonhyukseo/goormnes:${{ github.sha }}
+
+    game-helm-update:
+      runs-on: ubuntu-latest
+      needs: docker-image-build-and-test
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+        - name: Checkout Helm chart repository
+          uses: actions/checkout@v2
+          with:
+            repository: GoormBread/game-helm
+            token: ${{ secrets.GH_PAT }}
+            path: game-helm
+        
+        - name: Install yq
+          run: |
+            sudo apt-get update -y
+            sudo apt-get install -y jq
+        
+        - name: Update values.yaml
+          run: |
+            cd game-helm
+            yq eval '.nes.image.tag = "${{ github.sha }}"' -i ./game-helm/values.yaml
+        
+
+        - name: Setup Helm
+          uses: azure/setup-helm@v1
+          with:
+            version: 'v3.5.4'
+  
+        - name: Package Game Helm chart
+          run: |
+            cd game-helm
+            helm package game-helm/
+            helm repo index .
+
+        - name: Commit and Push changes
+          env:
+            GH_PAT: ${{ secrets.GH_PAT }}
+          run: |
+            cd game-helm
+            git config --global user.email "sgh4123@naver.com"
+            git config --global user.name "SeoGeonhyuk"
+            git add .
+            git commit -m "Update nes-streaming image tag to ${{ github.sha }} and package Helm chart"
+            git push https://x-access-token:${GH_PAT}@github.com/GoormBread/game-helm.git main
