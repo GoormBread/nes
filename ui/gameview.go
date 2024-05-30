@@ -55,8 +55,8 @@ func (view *GameView) save(snapshot int) {
 func (view *GameView) Enter() {
 	gl.ClearColor(0, 0, 0, 1)
 	view.director.SetTitle(view.title)
-	// view.console.SetAudioChannel(view.director.audio.channel)
-	// view.console.SetAudioSampleRate(view.director.audio.sampleRate)
+	view.console.SetAudioChannel(view.director.audio.channel)
+	view.console.SetAudioSampleRate(view.director.audio.sampleRate)
 	view.director.window.SetKeyCallback(view.onKey)
 	view.load(-1)
 }
@@ -149,25 +149,18 @@ func drawBuffer(window *glfw.Window) {
 	gl.End()
 }
 
-func updateCloudControllers(window *glfw.Window, message []byte, console *nes.Console) {
+func updateCloudControllers1(window *glfw.Window, message []byte, console *nes.Console) {
 	turbo := console.PPU.Frame%6 < 3
 	k1 := readKeysFromUser1(message, turbo)
-	k2 := readKeysFromUser2(message, turbo)
 	console.SetButtons1(k1)
-	console.SetButtons2(k2)
-	// window.MakeContextCurrent()
-	// var result [8]bool
-	// result[nes.ButtonA] = false
-	// result[nes.ButtonB] = false
-	// result[nes.ButtonSelect] = false
-	// result[nes.ButtonStart] = false
-	// result[nes.ButtonUp] = false
-	// result[nes.ButtonDown] = false
-	// result[nes.ButtonLeft] = false
-	// result[nes.ButtonRight] = false
-	// console.SetButtons1(result)
-	
 }
+
+func updateCloudControllers2(window *glfw.Window, message []byte, console *nes.Console) {
+	turbo := console.PPU.Frame%6 < 3
+	k2 := readKeysFromUser2(message, turbo)
+	console.SetButtons2(k2)
+}
+
 func updateCloudControllersDefault(window *glfw.Window, message []byte, console *nes.Console) {
 	turbo := console.PPU.Frame%6 < 3
 	j2 := readJoystick(glfw.Joystick2, turbo)

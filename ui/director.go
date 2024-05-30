@@ -24,15 +24,16 @@ type View interface {
 
 type Director struct {
 	window    *glfw.Window
-	// audio     *Audio
+	audio     *Audio
 	view      View
 	menuView  View
 	timestamp float64
 }
 
-func NewDirector(window *glfw.Window) *Director {
+func NewDirector(window *glfw.Window, audio *Audio) *Director {
 	director := Director{}
 	director.window = window
+    director.audio = audio
 	return &director
 }
 
@@ -82,16 +83,18 @@ func (d *Director) Run() {
 }
 
 func (d *Director) PlayGame(path string) {
-	hash, err := hashFile(path)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	console, err := nes.NewConsole(path)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	d.SetView(NewGameView(d, console, path, hash))
-	http.HandleFunc("/websocket", func(w http.ResponseWriter, r *http.Request) {
+    hash, err := hashFile(path)
+    if err != nil {
+        log.Fatalln(err)
+    }
+    console, err := nes.NewConsole(path)
+    if err != nil {
+        log.Fatalln(err)
+    }
+    d.SetView(NewGameView(d, console, path, hash))
+
+    // 1201 포트에서 웹소켓 연결 처리
+    http.HandleFunc("/keyboard/1p", func(w http.ResponseWriter, r *http.Request) {
         conn, err := upgrader.Upgrade(w, r, nil)
         if err != nil {
             log.Println("웹소켓 연결 설정 오류:", err)
@@ -106,21 +109,39 @@ func (d *Director) PlayGame(path string) {
                 log.Println("메시지 읽기 오류:", err)
                 break
             }
-			log.Println(string(message))
+            log.Println(string(message))
+
             // handle key input from websocket
-			// if string(message) == "Enter" || string(message) == "RightShift" || string(message) == "Z" || string(message) == "X" || string(message) == "UP" || string(message) == "DOWN" || string(message) == "LEFT" || string(message) == "RIGHT" || string(message) == "J" || string(message) == "K" || string(message) == "P" || string(message) == "O" || string(message) == "T" || string(message) == "G" || string(message) == "F" || string(message) == "H" {
-				log.Println("입력됨")
-				// d.view.onKey(d.window, glfw.KeyZ, 0, glfw.Press, 0)
-				updateCloudControllers(d.window, message, console)
-				// W 키에 대한 입력 처리 로직 추가
-				// 예: director.KeyPressed(glfw.KeyW)
-			// }
-			// updateCloudControllersDefault(d.window, message, console)
-			
+            updateCloudControllers1(d.window, message, console)
         }
     })
-	go http.ListenAndServe(":8080", nil)
-	log.Println("실행")
+    go http.ListenAndServe(":1201", nil)
+
+    // 1014 포트에서 웹소켓 연결 처리
+    http.HandleFunc("/keyboard/2p", func(w http.ResponseWriter, r *http.Request) {
+        conn, err := upgrader.Upgrade(w, r, nil)
+        if err != nil {
+            log.Println("웹소켓 연결 설정 오류:", err)
+            return
+        }
+        defer conn.Close()
+
+        // listen for messages from websocket client
+        for {
+            _, message, err := conn.ReadMessage()
+            if err != nil {
+                log.Println("메시지 읽기 오류:", err)
+                break
+            }
+            log.Println(string(message))
+
+            // handle key input from websocket
+            updateCloudControllers2(d.window, message, console)
+        }
+    })
+    go http.ListenAndServe(":1014", nil)
+
+    log.Println("실행")
 }
 
 func (d *Director) ShowMenu() {

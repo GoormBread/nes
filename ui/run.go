@@ -29,11 +29,11 @@ func Run(paths []string) {
 	// portaudio.Initialize()
 	// defer portaudio.Terminate()
 
-	// audio := NewAudio()
-	// if err := audio.Start(); err != nil {
-	// 	log.Fatalln(err)
-	// }
-	// defer audio.Stop()
+	audio := NewAudio()
+	if err := audio.Start(); err != nil {
+		log.Fatalln(err)
+	}
+	defer audio.Stop()
 
 	// initialize glfw
 	if err := glfw.Init(); err != nil {
@@ -57,6 +57,6 @@ func Run(paths []string) {
 	gl.Enable(gl.TEXTURE_2D)
 
 	// run director
-	director := NewDirector(window)
+	director := NewDirector(window, audio)
 	director.Start(paths)
 }
