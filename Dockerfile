@@ -47,6 +47,6 @@ pacmd set-default-sink v1\n\
 pacmd set-default-source v1.monitor" > pulseaudio-setup.sh && \
 chmod +x pulseaudio-setup.sh
 
-CMD ["bash", "-c", "./pulseaudio-setup.sh && Xvfb :1 -screen 0 1024x768x24 & sleep 10 && DISPLAY=:1 ./nesexe ./rom/Super_mario_brothers.nes"]
+CMD ["bash", "-c", "./pulseaudio-setup.sh && Xvfb :1 -screen 0 768x768x24 & sleep 10 && DISPLAY=:1 ./nesexe ./rom/Super_mario_brothers.nes"]
 
 EXPOSE 8080
