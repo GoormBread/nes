@@ -25,7 +25,7 @@ func (a *Audio) Start() error {
    ss := pulse.SampleSpec{
       Format:   pulse.SAMPLE_FLOAT32LE,
       Rate:     44100,
-      Channels: 2,
+      Channels: 1,
    }
    stream, err := pulse.Playback("Simple Playback", "Audio Stream", &ss)
    if err != nil {
@@ -43,7 +43,7 @@ func (a *Audio) Start() error {
 func (a *Audio) play() {
    for {
       // 오디오 데이터를 채널에서 읽어서 스트림에 씁니다.
-      buf := make([]float32, 2400)
+      buf := make([]float32, 2)
       for i := range buf {
          select {
          case sample := <-a.channel:

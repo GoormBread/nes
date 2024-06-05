@@ -1,3 +1,11 @@
+#ffmpeg command
+```
+docker exec game ffmpeg -f pulse -i v1.monitor -f x11grab -s 768x768 -i :1 -c:a libopus -b:a 24k -c:v libx264 -r 216 -preset ultrafast -tune zerolatency -b:v 1500k -f rtsp rtsp://localhost:8554/mystream
+```
+```
+docker exec game pkill ffmpeg
+```
+
 github action test
 ### Summary
 
