@@ -47,5 +47,5 @@ pacmd set-default-sink v1\n\
 pacmd set-default-source v1.monitor" > pulseaudio-setup.sh && \
 chmod +x pulseaudio-setup.sh
 
-CMD ["bash", "-c", "./pulseaudio-setup.sh && Xvfb :1 -screen 0 768x768x24 & sleep 10 && DISPLAY=:1 ./nesexe ./rom/Super_mario_brothers.nes & sleep 10 && ffmpeg -f pulse -i default -f x11grab -s 768x768 -i :1 -c:a libopus -b:a 24k -c:v libx264 -r 154 -preset ultrafast -tune zerolatency -b:v 1000k -f rtsp rtsp://localhost:8554/mystream"]
+CMD ["bash", "-c", "./pulseaudio-setup.sh && Xvfb :1 -screen 0 768x768x24 & sleep 10 && DISPLAY=:1 ./nesexe ./rom/Super_mario_brothers.nes & sleep 10 && ffmpeg -f pulse -i default -f x11grab -s 768x768 -i :1 -c:a libopus -b:a 24k -c:v libx264 -r 175 -preset ultrafast -tune zerolatency -b:v 1000k -f rtsp rtsp://localhost:8554/mystream"]
 EXPOSE 8080
