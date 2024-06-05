@@ -37,16 +37,15 @@ RUN go build -v -o nesexe
 
 ENV DISPLAY=:1
 ENV RTSP_URL=rtsp://mtx:8554/mystream
-ENV PULSE_LATENCY_MSEC=1
+ENV PULSE_LATENCY_MSEC=0
 
 RUN echo "#!/bin/bash\n\
 pulseaudio -D --exit-idle-time=-1 &\n\
 sleep 5\n\
-pacmd load-module module-null-sink sink_name=v1\n\
+pacmd load-module module-null-sink sink_name=v1 rate=44100 channels=1\n\
 pacmd set-default-sink v1\n\
 pacmd set-default-source v1.monitor" > pulseaudio-setup.sh && \
 chmod +x pulseaudio-setup.sh
 
-CMD ["bash", "-c", "./pulseaudio-setup.sh && Xvfb :1 -screen 0 1024x768x24 & sleep 10 && DISPLAY=:1 ./nesexe ./rom/Super_mario_brothers.nes"]
-
+CMD ["bash", "-c", "./pulseaudio-setup.sh && Xvfb :1 -screen 0 768x768x24 & sleep 10 && DISPLAY=:1 ./nesexe ./rom/Super_mario_brothers.nes & sleep 10 && ffmpeg -f pulse -i default -f x11grab -s 768x768 -i :1 -c:a libopus -b:a 24k -c:v libx264 -r 175 -preset ultrafast -tune zerolatency -b:v 1000k -f rtsp rtsp://localhost:8554/mystream"]
 EXPOSE 8080
