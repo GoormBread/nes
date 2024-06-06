@@ -1,7 +1,7 @@
-FROM ubuntu:latest
+FROM nvidia/cuda:12.5.0-base-ubuntu22.04
 
+# 필수 패키지 설치
 RUN apt-get update && apt-get install -y \
-    libportaudio2 \
     libgl1-mesa-dev \
     libx11-dev \
     libxcursor-dev \
@@ -9,13 +9,11 @@ RUN apt-get update && apt-get install -y \
     libxinerama-dev \
     libxi-dev \
     libxxf86vm-dev \
-    portaudio19-dev \
     git \
     golang-go \
     xorg \
     x11-apps \
     ffmpeg \
-    xvfb \
     libasound2-dev \
     pkg-config \
     pulseaudio \
@@ -24,21 +22,21 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
+# 소스 코드 복사 및 빌드
 COPY . .
 RUN go mod tidy && \
-    go mod download
-
-# 필요한 모듈 설치
-RUN go get github.com/go-gl/gl/v2.1/gl && \
+    go mod download && \
+    go get github.com/go-gl/gl/v2.1/gl && \
     go get github.com/go-gl/glfw/v3.2/glfw && \
-    go get github.com/mesilliac/pulse-simple
-    
-RUN go build -v -o nesexe
+    go get github.com/mesilliac/pulse-simple && \
+    go build -v -o nesexe
 
-ENV DISPLAY=:1
+# 환경 변수 설정
+ENV DISPLAY=:0
 ENV RTSP_URL=rtsp://mtx:8554/mystream
 ENV PULSE_LATENCY_MSEC=0
 
+# PulseAudio 설정 스크립트 작성
 RUN echo "#!/bin/bash\n\
 pulseaudio -D --exit-idle-time=-1 &\n\
 sleep 5\n\
@@ -47,5 +45,6 @@ pacmd set-default-sink v1\n\
 pacmd set-default-source v1.monitor" > pulseaudio-setup.sh && \
 chmod +x pulseaudio-setup.sh
 
-CMD ["bash", "-c", "./pulseaudio-setup.sh && Xvfb :1 -screen 0 768x768x24 & sleep 10 && DISPLAY=:1 ./nesexe ./rom/Super_mario_brothers.nes & sleep 10 && ffmpeg -f pulse -i default -f x11grab -s 768x768 -i :1 -c:a libopus -b:a 24k -c:v libx264 -r 175 -preset ultrafast -tune zerolatency -b:v 1000k -f rtsp rtsp://localhost:8554/mystream"]
+# 명령 실행
+CMD ["bash", "-c", "./pulseaudio-setup.sh && Xorg :0 & sleep 10 && DISPLAY=:0 ./nesexe ./rom/Super_mario_brothers.nes & sleep 10 && ffmpeg -f pulse -i default -f x11grab -s 768x768 -i :0 -c:a libopus -b:a 24k -c:v libx264 -r 175 -preset ultrafast -tune zerolatency -b:v 1000k -f rtsp rtsp://localhost:8554/mystream"]
 EXPOSE 8080
