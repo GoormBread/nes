@@ -51,7 +51,7 @@ pacmd set-default-source v1.monitor" > pulseaudio-setup.sh && \
 chmod +x pulseaudio-setup.sh
 
 # ffmpeg에서 GPU 가속 사용을 위한 옵션 추가
-CMD ["bash", "-c", "./pulseaudio-setup.sh && Xvfb :1 -screen 0 768x768x24 & sleep 10 && DISPLAY=:1 ./nesexe \"./rom/${GAME}.nes\" & sleep 10 && ffmpeg -hwaccel cuda -f pulse -i default -f x11grab -s 768x768 -i :1 -map 0:a:0 -c:a libopus -compression_level 0 -b:a 24k -af aresample=async=0.1 -map 1:v:0 -r 75 -c:v h264_nvenc -preset p1 -tune ll -b:v 1000k -f rtsp rtsp://localhost:8554/mystream"]
+CMD ["bash", "-c", "./pulseaudio-setup.sh && Xvfb :1 -screen 0 768x768x24 & sleep 10 && DISPLAY=:1 ./nesexe \"./rom/${GAME}.nes\" & sleep 10 && ffmpeg -hwaccel cuda -f pulse -i default -f x11grab -s 768x768 -i :1 -map 0:a:0 -c:a libopus -compression_level 0 -b:a 16k -af aresample=async=0.7 -map 1:v:0 -r 60 -c:v h264_nvenc -preset p2 -tune ll -b:v 1000k -f rtsp rtsp://localhost:8554/mystream"]
 EXPOSE 8080
 
 # f61 젤 좋음 아직까지
