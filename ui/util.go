@@ -58,89 +58,62 @@ func readKey(window *glfw.Window, key glfw.Key) bool {
 }
 
 func readKeysFromUser1(message []byte, turbo bool) [8]bool {
-    var result [8]bool
-    result[nes.ButtonA] = false
-    result[nes.ButtonB] = false
-    result[nes.ButtonSelect] = false
-    result[nes.ButtonStart] = false
-    result[nes.ButtonUp] = false
-    result[nes.ButtonDown] = false
-    result[nes.ButtonLeft] = false
-    result[nes.ButtonRight] = false
+	var keys struct {
+		ArrowUp    bool `json:"ArrowUp"`
+		ArrowDown  bool `json:"ArrowDown"`
+		ArrowLeft  bool `json:"ArrowLeft"`
+		ArrowRight bool `json:"ArrowRight"`
+		Z          bool `json:"Z"`
+		X          bool `json:"X"`
+		RightShift bool `json:"RightShift"`
+		Enter      bool `json:"Enter"`
+	}
+	
+	var result [8]bool
+	err := json.Unmarshal(message, &keys)
+	if err != nil {
+		log.Println("JSON 파싱 오류:", err)
+		return result
+	}
 
-    var pressedKeys []string
-    err := json.Unmarshal(message, &pressedKeys)
-    if err != nil {
-        log.Println("JSON 파싱 오류:", err)
-        return result
-    }
-
-    for _, key := range pressedKeys {
-        switch key {
-        case "Z":
-            result[nes.ButtonA] = true
-        case "X":
-            result[nes.ButtonB] = true
-        case "Enter":
-            log.Println("실행됨")
-            result[nes.ButtonStart] = true
-        case "RightShift":
-            result[nes.ButtonSelect] = true
-        case "UP":
-            result[nes.ButtonUp] = true
-        case "DOWN":
-            result[nes.ButtonDown] = true
-        case "LEFT":
-            result[nes.ButtonLeft] = true
-        case "RIGHT":
-            result[nes.ButtonRight] = true
-        }
-    }
-
-    return result
+	result[nes.ButtonA] = keys.Z
+	result[nes.ButtonB] = keys.X
+	result[nes.ButtonSelect] = keys.RightShift
+	result[nes.ButtonStart] = keys.Enter
+	result[nes.ButtonUp] = keys.ArrowUp
+	result[nes.ButtonDown] = keys.ArrowDown
+	result[nes.ButtonLeft] = keys.ArrowLeft
+	result[nes.ButtonRight] = keys.ArrowRight
+	return result
 }
 
 func readKeysFromUser2(message []byte, turbo bool) [8]bool {
-    var result [8]bool
-    result[nes.ButtonA] = false
-    result[nes.ButtonB] = false
-    result[nes.ButtonSelect] = false
-    result[nes.ButtonStart] = false
-    result[nes.ButtonUp] = false
-    result[nes.ButtonDown] = false
-    result[nes.ButtonLeft] = false
-    result[nes.ButtonRight] = false
-
-    var pressedKeys []string
-    err := json.Unmarshal(message, &pressedKeys)
-    if err != nil {
-        log.Println("JSON 파싱 오류:", err)
-        return result
-    }
-
-    for _, key := range pressedKeys {
-        switch key {
-        case "Z":
-            result[nes.ButtonA] = true
-        case "X":
-            result[nes.ButtonB] = true
-        case "Enter":
-            log.Println("실행됨")
-            result[nes.ButtonStart] = true
-        case "RightShift":
-            result[nes.ButtonSelect] = true
-        case "UP":
-            result[nes.ButtonUp] = true
-        case "DOWN":
-            result[nes.ButtonDown] = true
-        case "LEFT":
-            result[nes.ButtonLeft] = true
-        case "RIGHT":
-            result[nes.ButtonRight] = true
-        }
-    }
-
-    return result
+	var keys struct {
+		ArrowUp    bool `json:"ArrowUp"`
+		ArrowDown  bool `json:"ArrowDown"`
+		ArrowLeft  bool `json:"ArrowLeft"`
+		ArrowRight bool `json:"ArrowRight"`
+		Z          bool `json:"Z"`
+		X          bool `json:"X"`
+		RightShift bool `json:"RightShift"`
+		Enter      bool `json:"Enter"`
+	}
+	
+	var result [8]bool
+	err := json.Unmarshal(message, &keys)
+	if err != nil {
+		log.Println("JSON 파싱 오류:", err)
+		return result
+	}
+	result[nes.ButtonA] = keys.Z
+	result[nes.ButtonB] = keys.X
+	result[nes.ButtonSelect] = keys.RightShift
+	result[nes.ButtonStart] = keys.Enter
+	result[nes.ButtonUp] = keys.ArrowUp
+	result[nes.ButtonDown] = keys.ArrowDown
+	result[nes.ButtonLeft] = keys.ArrowLeft
+	result[nes.ButtonRight] = keys.ArrowRight
+	return result
 }
 
 func readKeys1(window *glfw.Window, turbo bool) [8]bool {

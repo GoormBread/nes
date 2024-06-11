@@ -16,7 +16,7 @@ type Audio struct {
 
 func NewAudio() *Audio {
    a := Audio{}
-   a.channel = make(chan float32, 44100)
+   a.channel = make(chan float32, 4096)
    return &a
 }
 
@@ -43,7 +43,7 @@ func (a *Audio) Start() error {
 func (a *Audio) play() {
    for {
       // 오디오 데이터를 채널에서 읽어서 스트림에 씁니다.
-      buf := make([]float32, 2)
+      buf := make([]float32, 1024)
       for i := range buf {
          select {
          case sample := <-a.channel:
